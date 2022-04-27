@@ -9,12 +9,12 @@ jobs:
           if [[ $(docker ps -aq | wc -l) -ne 0 ]]; then docker stop $(docker ps -aq) && docker rm $(docker ps -aq); fi
           if [[ $(docker images -q | wc -l) -ne 0 ]]; then docker image rm --force $(docker images -q); fi
       - uses: actions/checkout@v3
+      - name: INFO - pwd && ls
+        run: pwd && ls
       - name: Build the Docker image
         run: docker build . --file Dockerfile --tag demo-app
       # - name: Export the docker image as tar file
       #   run: docker save demo-app > demo-app_save.tar
-      - name: INFO - pwd && ls
-        run: pwd && ls
       - name: INFO - docker images
         run: docker images
       - name: Start the image
