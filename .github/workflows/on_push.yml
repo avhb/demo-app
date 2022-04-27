@@ -63,13 +63,6 @@ jobs:
       # - name: Push into Docker Hub
       #   run: docker push ${{ steps.docker-tag.outputs.tag }}
 
-      # tag the commit -> corresponds with the docker version tag
-      - name: Tag commit
-        uses: tvdias/github-tagger@v0.0.2
-        with:
-          repo-token: "${{ secrets.GITHUB_TOKEN }}"
-          tag: "my_tag"
-
   Publish-Docker-Image:
     needs: Build-Docker-Image
     runs-on: ubuntu-20.04
