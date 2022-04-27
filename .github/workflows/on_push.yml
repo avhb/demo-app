@@ -2,7 +2,7 @@ name: Docker Image CI
 on: [push]
 jobs:
   Build-and-Publish-Docker-Image:
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     outputs:
       docker-image-tag: ${{ steps.docker-tag.outputs.tag }}
     steps:
@@ -51,7 +51,7 @@ jobs:
 
   Smoketests:
     needs: Build-and-Publish-Docker-Image
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     steps:
       - name: Log in to Docker Hub
         env:
@@ -61,7 +61,8 @@ jobs:
 
       - run: docker images
       - run: docker pull ${{ needs.Build-and-Publish-Docker-Image.outputs.docker-image-tag }}
-
+      - run: docker images
+      - run: ping -c 4 arvanh-dev.barco.com
 
 
 
