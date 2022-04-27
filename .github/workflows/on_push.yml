@@ -24,6 +24,7 @@ jobs:
         run: docker run -d -p 5000:5000 demo-app
       - run: ip a
       - run: curl http://google.com
+      - run: docker logs $(docker ps -q)
       - name: Check with curl that image is running
         run: curl http://127.0.0.1:5000/
       #- name: get the smoketest - it is in the same repo
