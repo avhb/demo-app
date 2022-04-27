@@ -24,27 +24,21 @@ jobs:
       - name: Set docker image name
         id: docker-name
         run: echo "::set-output name=name::demo-app"
-
       - name: Create timestamped docker tag
         id: docker-tag
         run: echo "::set-output name=tag::${{ steps.docker-name.outputs.name }}:$(date '+%Y%m%dT%H%M%S')"
       
-      - run: echo full docker image ${{ steps.docker-tag.outputs.tag }}
-
       - name: Build the Docker image
         run: |
           pushd app
           docker build . --file Dockerfile --tag ${{ steps.docker-tag.outputs.tag }}
           popd
-      
-      # - name: Export the docker image as tar file
-      #   run: docker save demo-app > demo-app_save.tar
-      
+
       - name: INFO - docker images
         run: docker images
       
       - name: Start the image
-        run: docker run -d -p 5000:5000 demo-app
+        run: docker run -d -p 5000:5000 ${{ steps.docker-tag.outputs.tag }}
       
       - name: Check with curl that image is running
         run: curl http://127.0.0.1:5000/
