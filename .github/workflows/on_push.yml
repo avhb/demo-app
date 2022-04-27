@@ -12,8 +12,6 @@ jobs:
           # The directory path of the checked-out repository 
           path: ./ # This is the default value. ${{ github.workspace }}
 
-
-
       - name: Check commit ids
         run: |
           echo "COMMIT ID:" ${{ steps.get_commit_id.outputs.commit_id }}
@@ -57,7 +55,6 @@ jobs:
       
       - name: Check with curl that image is running
         run: for i in 1 2 3 4 5 6 7 8 9 10; do curl http://127.0.0.1:5000/ && break || sleep 1; done
-      - run: echo "::set-output name=action_fruit::strawberry"
 
       - name: Log in to Docker Hub
         env:
