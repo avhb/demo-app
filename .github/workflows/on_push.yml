@@ -47,7 +47,7 @@ jobs:
 
       - name: Log in to Docker Hub
         env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_USERNAME: avhb
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
         run: docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
 
