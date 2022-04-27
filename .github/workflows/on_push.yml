@@ -20,13 +20,14 @@ jobs:
       #   run: | 
       #     if [[ $(docker ps -aq | wc -l) -ne 0 ]]; then docker stop $(docker ps -aq) && docker rm $(docker ps -aq); fi
       #     if [[ $(docker images -q | wc -l) -ne 0 ]]; then docker image rm --force $(docker images -q); fi
-      
+
+
       - name: Set docker image name
         id: docker-name
         run: echo "::set-output name=name::demo-app"
       - name: Create timestamped docker tag
         id: docker-tag
-        run: echo "::set-output name=tag::${{ steps.docker-name.outputs.name }}:$(date '+%Y%m%dT%H%M%S')"
+        run: echo "::set-output name=tag::avhb/${{ steps.docker-name.outputs.name }}:$(date '+%Y%m%dT%H%M%S')"
       
       - name: Build the Docker image
         run: |
@@ -44,6 +45,15 @@ jobs:
         run: for i in 1 2 3 4 5 6 7 8 9 10; do curl http://127.0.0.1:5000/ && break || sleep 1; done
       - run: echo "::set-output name=action_fruit::strawberry"
 
+      - name: Log in to Docker Hub
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+        run: docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
+
+      #- name: Push into Docker Hub
+      #  run: docker push randilt/flask-github-actions-app
+
   Publish-Docker-Image:
     needs: Build-Docker-Image
     runs-on: ubuntu-20.04
@@ -51,21 +61,3 @@ jobs:
       - name: INFO - docker images
         run: docker images
       - run: echo ${{ needs.Build-Docker-Image.outputs.docker-image-tag }}
-
-
-
-      - name: check if I knwo the secret
-        env:
-          WHO_TO_TRUST: ${{ secrets.GHCR_KEY }}
-        if:  env.WHO_TO_TRUST == 'hello'
-        run: echo "I know what the secret token is!"
-      #- run: echo ${{ secrets.GHCR_KEY }}
-
-      #create selenium grid clients with docker
-
-
-
-        # - create a new 
-      #- run: ping 10.200.20.222
-
-
