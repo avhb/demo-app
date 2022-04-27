@@ -7,15 +7,7 @@ jobs:
       docker-image-tag: ${{ steps.docker-tag.outputs.tag }}
     steps:
       - uses: actions/checkout@v3
-      - uses: fufuhu/get-commit-id
-        with:
-          # The directory path of the checked-out repository 
-          path: ./ # This is the default value. ${{ github.workspace }}
 
-      - name: Check commit ids
-        run: |
-          echo "COMMIT ID:" ${{ steps.get_commit_id.outputs.commit_id }}
-          echo "SHORT COMMIT ID:" ${{ steps.get_commit_id.outputs.short_commit_id }}
 
       - name: Get info
         run: |
