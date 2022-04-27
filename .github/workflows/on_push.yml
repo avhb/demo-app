@@ -3,6 +3,8 @@ on: [push]
 jobs:
   Build-Docker-Image:
     runs-on: ubuntu-20.04
+    outputs:
+      docker-image-tag: ${{ steps.docker-tag.outputs.tag }}
     steps:
       - uses: actions/checkout@v3
       - name: Get info
@@ -21,12 +23,12 @@ jobs:
       
       - name: Create timestamped docker tag
         id: docker-tag
-        run: echo "::set-output name=docker-tag::demo-app:$(date '+%Y%m%d%T')"
+        run: echo "::set-output name=tag::demo-app:$(date '+%Y%m%d%T')"
 
       - name: Build the Docker image
         run: |
           pushd app
-          docker build . --file Dockerfile --tag ${{ steps.date.outputs.date }}
+          docker build . --file Dockerfile --tag ${{ steps.docker-tag.outputs.tag }}
           popd
       
       # - name: Export the docker image as tar file
@@ -54,7 +56,7 @@ jobs:
     steps:
       - name: test
         run: echo hello world
-      - run: echo ${{ Build-Docker-Image.outputs.action_fruit }}
+      - run: echo ${{ needs.Build-Docker-Image.outputs.docker-image-tag }}
       - run: echo ${{ secrets.GHCR_KEY }}
 
       #create selenium grid clients with docker
