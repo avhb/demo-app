@@ -24,9 +24,11 @@ jobs:
       - name: set docker image name
         env:
           DOCKER_IMAGE_NAME: demo-app
+        run: echo ${DOCKER_IMAGER_NAME}
+
       - name: Create timestamped docker tag
         id: docker-tag
-        run: echo "::set-output name=tag::$DOCKER_IMAGE_NAME:$(date '+%Y%m%dT%H%M%S')"
+        run: echo "::set-output name=tag::${DOCKER_IMAGE_NAME}:$(date '+%Y%m%dT%H%M%S')"
       - run: echo full docker image ${{ steps.docker-tag.outputs.tag }}
 
       - name: Build the Docker image
