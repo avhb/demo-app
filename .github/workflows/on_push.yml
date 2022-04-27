@@ -48,10 +48,16 @@ jobs:
     needs: Build-Docker-Image
     runs-on: ubuntu-20.04
     steps:
-      - name: test
-        run: echo hello world
+      - name: INFO - docker images
+        run: docker images
       - run: echo ${{ needs.Build-Docker-Image.outputs.docker-image-tag }}
-      - run: echo ${{ secrets.GHCR_KEY }}
+
+
+
+      - name: check if I knwo the secret
+        if:  secrets.GHCR_KEY == 'hello'
+        run: echo "I know what the secret token is!"
+      #- run: echo ${{ secrets.GHCR_KEY }}
 
       #create selenium grid clients with docker
 
