@@ -21,14 +21,13 @@ jobs:
       #     if [[ $(docker ps -aq | wc -l) -ne 0 ]]; then docker stop $(docker ps -aq) && docker rm $(docker ps -aq); fi
       #     if [[ $(docker images -q | wc -l) -ne 0 ]]; then docker image rm --force $(docker images -q); fi
       
-      - name: set docker image name
-        env:
-          DOCKER_IMAGE_NAME: demo-app
-        run: echo $DOCKER_IMAGE_NAME
+      - name: Set docker image name
+        id: docker-name
+        run: echo "::set-output name=name::demo-app"
 
       - name: Create timestamped docker tag
         id: docker-tag
-        run: echo "::set-output name=tag::$(echo $DOCKER_IMAGE_NAME):$(date '+%Y%m%dT%H%M%S')"
+        run: echo "::set-output name=tag::${{ steps.docker-name.outputs.name }}:$(date '+%Y%m%dT%H%M%S')"
       
       - run: echo full docker image ${{ steps.docker-tag.outputs.tag }}
 
