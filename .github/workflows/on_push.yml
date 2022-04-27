@@ -51,8 +51,8 @@ jobs:
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
         run: docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
 
-      #- name: Push into Docker Hub
-      #  run: docker push randilt/flask-github-actions-app
+      - name: Push into Docker Hub
+        run: docker push ${{ steps.docker-tag.outputs.tag }}
 
   Publish-Docker-Image:
     needs: Build-Docker-Image
