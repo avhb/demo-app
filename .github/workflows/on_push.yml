@@ -2,7 +2,7 @@ name: Docker Image CI
 on: [push]
 jobs:
   Build-Docker-Image:
-    runs-on: self-hosted
+    runs-on: ubuntu-20.04
     steps:
       - name: Cleanup docker environment (removing all containers and images)
         run: | 
