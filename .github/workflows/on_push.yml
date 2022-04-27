@@ -1,7 +1,7 @@
 name: Docker Image CI
 on: [push]
 jobs:
-  Build-Docker-Image:
+  Build-and-Publish-Docker-Image:
     runs-on: ubuntu-20.04
     outputs:
       docker-image-tag: ${{ steps.docker-tag.outputs.tag }}
@@ -49,16 +49,19 @@ jobs:
       - name: Push into Docker Hub
         run: docker push ${{ steps.docker-tag.outputs.tag }}
 
-  Publish-Docker-Image:
-    needs: Build-Docker-Image
+  E2E-Test:
+    needs: Build-and-Publish-Docker-Image
     runs-on: ubuntu-20.04
     steps:
-      - name: INFO - docker images
-        run: docker images
-      - run: echo ${{ needs.Build-Docker-Image.outputs.docker-image-tag }}
+      - name: Log in to Docker Hub
+        env:
+          DOCKERHUB_USERNAME: avhb
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+        run: docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
 
-
-
+      - run: docker images
+      - run: docker pull ${{ needs.Build-Docker-Image.outputs.docker-image-tag }}
+      
 
 
 
