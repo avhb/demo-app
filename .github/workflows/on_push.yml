@@ -7,29 +7,25 @@ jobs:
       docker-image-tag: ${{ steps.docker-tag.outputs.tag }}
     steps:
       - uses: actions/checkout@v3
-
-
+      
       - name: Get info
         run: |
-          echo "job triggered by - ${{ github.event_name }}"
-          echo "job running on ${{ runner.os }} server hosted by GitHub!"
-          echo "branch name - ${{ github.ref }}, repo - ${{ github.repository }}"
-          echo "job status - ${{ job.status }}."
           echo "pwd: $(pwd)"
+          ls
           ls ${{ github.workspace }}
-      
-      # - name: Cleanup docker environment (removing all containers and images)
-      #   run: | 
-      #     if [[ $(docker ps -aq | wc -l) -ne 0 ]]; then docker stop $(docker ps -aq) && docker rm $(docker ps -aq); fi
-      #     if [[ $(docker images -q | wc -l) -ne 0 ]]; then docker image rm --force $(docker images -q); fi
 
-
-      - name: Set docker image name
-        id: docker-name
-        run: echo "::set-output name=name::demo-app"
-      - name: Create ~~timestamped~~ commit id - docker tag
+      - name: Set docker username -> "steps.docker-user-name.outputs.user-name"
+        id: docker-user-name
+        run: echo "::set-output name=user-name::avhb"
+      - name: Set docker image name -> "steps.docker-image-name.outputs.image-name"
+        id: docker-image-name
+        run: echo "::set-output name=image-name::demo-app"
+      - name: Get short commit id -> "steps.git-commit-id.outputs.commit-id"
+        id: git-commit-id
+        run: echo "::set-output name=commit-id::$(git rev-parse --short HEAD)"
+      - name: Create docker tag -> steps.docker-tag.outputs.tag 
         id: docker-tag
-        run: echo "::set-output name=tag::avhb/${{ steps.docker-name.outputs.name }}:${{ steps.get_commit_id.outputs.short_commit_id }}"
+        run: echo "::set-output name=tag::${{ steps.docker-user-name.outputs.user-name }}/${{ steps.docker-image-name.outputs.name }}:${{ steps.git-commit-id.outputs.commit-id }}"
     
       - name: Build the Docker image
         run: |
@@ -37,12 +33,10 @@ jobs:
           docker build . --file Dockerfile --tag ${{ steps.docker-tag.outputs.tag }}
           popd
 
-      - name: INFO - docker images
-        run: docker images
+      - run: docker images
       
       - name: Start the image
         run: docker run -d -p 5000:5000 ${{ steps.docker-tag.outputs.tag }}
-      
       - name: Check with curl that image is running
         run: for i in 1 2 3 4 5 6 7 8 9 10; do curl http://127.0.0.1:5000/ && break || sleep 1; done
 
@@ -52,8 +46,8 @@ jobs:
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
         run: docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
 
-      # - name: Push into Docker Hub
-      #   run: docker push ${{ steps.docker-tag.outputs.tag }}
+       - name: Push into Docker Hub
+         run: docker push ${{ steps.docker-tag.outputs.tag }}
 
   Publish-Docker-Image:
     needs: Build-Docker-Image
@@ -62,3 +56,13 @@ jobs:
       - name: INFO - docker images
         run: docker images
       - run: echo ${{ needs.Build-Docker-Image.outputs.docker-image-tag }}
+
+
+
+
+
+
+# - name: Cleanup docker environment (removing all containers and images)
+      #   run: | 
+      #     if [[ $(docker ps -aq | wc -l) -ne 0 ]]; then docker stop $(docker ps -aq) && docker rm $(docker ps -aq); fi
+      #     if [[ $(docker images -q | wc -l) -ne 0 ]]; then docker image rm --force $(docker images -q); fi
