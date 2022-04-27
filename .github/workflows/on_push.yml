@@ -12,7 +12,10 @@ jobs:
       - name: INFO - pwd && ls
         run: pwd && ls
       - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag demo-app
+        run: |
+          pushd app
+          docker build . --file Dockerfile --tag demo-app
+          popd
       # - name: Export the docker image as tar file
       #   run: docker save demo-app > demo-app_save.tar
       - name: INFO - docker images
