@@ -4,21 +4,29 @@ jobs:
   Build-Docker-Image:
     runs-on: self-hosted
     steps:
-      - name: cleanup docker environment
+      - name: Cleanup docker environment (removing all containers and images)
         run: | 
           if [[ $(docker ps -aq | wc -l) -ne 0 ]]; then docker stop $(docker ps -aq) && docker rm $(docker ps -aq); fi
           if [[ $(docker images -q | wc -l) -ne 0 ]]; then docker image rm --force $(docker images -q); fi
       - uses: actions/checkout@v3
       - name: Build the Docker image
         run: docker build . --file Dockerfile --tag demo-app
-      - run: docker save demo-app > demo-app_save.tar
-      - run: ls
-      - run: pwd
-      - run: docker images
-      - name: start the image
+      # - name: Export the docker image as tar file
+      #   run: docker save demo-app > demo-app_save.tar
+      - name: INFO - pwd && ls
+        run: pwd && ls
+      - name: INFO - docker images
+        run: docker images
+      - name: Start the image
         run: docker run -d -p 5000:5000 demo-app
+      - name: Check with curl that image is running
+        run: curl http://127.0.0.1:5000/
       #- name: get the smoketest - it is in the same repo
-
+  Publish-Docker-Image:
+    needs: Build-Docker-Image
+    runs-on: ubuntu-20.04
+      - name: test
+        run: echo hello world
 
       #create selenium grid clients with docker
 
