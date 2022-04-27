@@ -25,7 +25,7 @@ jobs:
         run: echo "::set-output name=commit-id::$(git rev-parse --short HEAD)"
       - name: Create docker tag -> steps.docker-tag.outputs.tag 
         id: docker-tag
-        run: echo "::set-output name=tag::${{ steps.docker-user-name.outputs.user-name }}/${{ steps.docker-image-name.outputs.name }}:${{ steps.git-commit-id.outputs.commit-id }}"
+        run: echo "::set-output name=tag::${{ steps.docker-user-name.outputs.user-name }}/${{ steps.docker-image-name.outputs.image-name }}:${{ steps.git-commit-id.outputs.commit-id }}"
     
       - name: Build the Docker image
         run: |
