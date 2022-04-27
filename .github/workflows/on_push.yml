@@ -55,7 +55,9 @@ jobs:
 
 
       - name: check if I knwo the secret
-        if:  secrets.GHCR_KEY == 'hello'
+        env:
+          WHO_TO_TRUST: ${{ secrets.GHCR_KEY }}
+        if:  env.WHO_TO_TRUST == 'hello'
         run: echo "I know what the secret token is!"
       #- run: echo ${{ secrets.GHCR_KEY }}
 
