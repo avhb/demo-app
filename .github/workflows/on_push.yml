@@ -7,6 +7,18 @@ jobs:
       docker-image-tag: ${{ steps.docker-tag.outputs.tag }}
     steps:
       - uses: actions/checkout@v3
+      - uses: fufuhu/get-commit-id
+        with:
+          # The directory path of the checked-out repository 
+          path: ./ # This is the default value. ${{ github.workspace }}
+
+
+
+      - name: Check commit ids
+        run: |
+          echo "COMMIT ID:" ${{ steps.get_commit_id.outputs.commit_id }}
+          echo "SHORT COMMIT ID:" ${{ steps.get_commit_id.outputs.short_commit_id }}
+
       - name: Get info
         run: |
           echo "job triggered by - ${{ github.event_name }}"
@@ -25,10 +37,12 @@ jobs:
       - name: Set docker image name
         id: docker-name
         run: echo "::set-output name=name::demo-app"
-      - name: Create timestamped docker tag
+      - name: Create ~~timestamped~~ commit id - docker tag
         id: docker-tag
-        run: echo "::set-output name=tag::avhb/${{ steps.docker-name.outputs.name }}:$(date '+%Y%m%dT%H%M%S')"
+        run: echo "::set-output name=tag::avhb/${{ steps.docker-name.outputs.name }}:${{ steps.get_commit_id.outputs.short_commit_id }}"
       
+
+
       - name: Build the Docker image
         run: |
           pushd app
@@ -51,8 +65,16 @@ jobs:
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
         run: docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
 
-      - name: Push into Docker Hub
-        run: docker push ${{ steps.docker-tag.outputs.tag }}
+      # - name: Push into Docker Hub
+      #   run: docker push ${{ steps.docker-tag.outputs.tag }}
+
+      # tag the commit -> corresponds with the docker version tag
+        - name: Tag commit
+          uses: tvdias/github-tagger@v0.0.2
+          with:
+            repo-token: "${{ secrets.GITHUB_TOKEN }}"
+            tag: "my_tag"
+
 
   Publish-Docker-Image:
     needs: Build-Docker-Image
