@@ -4,7 +4,7 @@ python -m venv venv310
 - activate venv: (windows) `. venv310/Scripts/Activate.ps1` or (linux) `. venv310/bin/activate`
 - install requirements: `pip install -r requirements.txt`
 
-
+test
 
 POM
 
