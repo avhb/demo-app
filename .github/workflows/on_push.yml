@@ -11,32 +11,36 @@ jobs:
           echo "job running on ${{ runner.os }} server hosted by GitHub!"
           echo "branch name - ${{ github.ref }}, repo - ${{ github.repository }}"
           echo "job status - ${{ job.status }}."
-      - name: INFO - docker images
-        run: docker images
-      - name: Cleanup docker environment (removing all containers and images)
-        run: | 
-          if [[ $(docker ps -aq | wc -l) -ne 0 ]]; then docker stop $(docker ps -aq) && docker rm $(docker ps -aq); fi
-          if [[ $(docker images -q | wc -l) -ne 0 ]]; then docker image rm --force $(docker images -q); fi
-      - name: INFO - pwd && ls
-        run: pwd && ls ${{ github.workspace }}
+          echo "pwd: $(pwd)"
+          ls ${{ github.workspace }}
+      
+      # - name: Cleanup docker environment (removing all containers and images)
+      #   run: | 
+      #     if [[ $(docker ps -aq | wc -l) -ne 0 ]]; then docker stop $(docker ps -aq) && docker rm $(docker ps -aq); fi
+      #     if [[ $(docker images -q | wc -l) -ne 0 ]]; then docker image rm --force $(docker images -q); fi
+      
+      - name: Create timestamped docker tag
+        id: docker-tag
+        run: echo "::set-output name=docker-tag::demo-app:$(date '+%Y%m%d%T')"
+
       - name: Build the Docker image
         run: |
           pushd app
-          docker build . --file Dockerfile --tag demo-app
+          docker build . --file Dockerfile --tag ${{ steps.date.outputs.date }}
           popd
+      
       # - name: Export the docker image as tar file
       #   run: docker save demo-app > demo-app_save.tar
+      
       - name: INFO - docker images
         run: docker images
+      
       - name: Start the image
         run: docker run -d -p 5000:5000 demo-app
+      
       - name: Check with curl that image is running
         run: curl http://127.0.0.1:5000/
-      - run: ip a
-      - run: docker logs $(docker ps -q)
-      - name: Check with curl that image is running
-        run: curl http://127.0.0.1:5000/
-      - ::set-output name={name}::{value}
+      - run: echo "::set-output name=action_fruit::strawberry"
       - name: Cleanup docker environment (removing all containers and images)
         if: always()
         run: | 
@@ -50,6 +54,8 @@ jobs:
     steps:
       - name: test
         run: echo hello world
+      - run: echo ${{ action_fruit }}
+      - run: echo ${{ secrets.GHCR_KEY }}
 
       #create selenium grid clients with docker
 
