@@ -28,7 +28,7 @@ jobs:
 
       - name: Create timestamped docker tag
         id: docker-tag
-        run: echo "::set-output name=tag::$DOCKER_IMAGE_NAME:$(date '+%Y%m%dT%H%M%S')"
+        run: echo "::set-output name=tag::$(echo $DOCKER_IMAGE_NAME):$(date '+%Y%m%dT%H%M%S')"
       
       - run: echo full docker image ${{ steps.docker-tag.outputs.tag }}
 
