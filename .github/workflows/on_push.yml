@@ -4,15 +4,21 @@ jobs:
   Build-Docker-Image:
     runs-on: ubuntu-20.04
     steps:
+      - uses: actions/checkout@v3
+      - name: Get info
+        run: |
+          echo "job triggered by - ${{ github.event_name }}"
+          echo "job running on ${{ runner.os }} server hosted by GitHub!"
+          echo "branch name - ${{ github.ref }}, repo - ${{ github.repository }}"
+          echo "job status - ${{ job.status }}."
       - name: INFO - docker images
         run: docker images
       - name: Cleanup docker environment (removing all containers and images)
         run: | 
           if [[ $(docker ps -aq | wc -l) -ne 0 ]]; then docker stop $(docker ps -aq) && docker rm $(docker ps -aq); fi
           if [[ $(docker images -q | wc -l) -ne 0 ]]; then docker image rm --force $(docker images -q); fi
-      - uses: actions/checkout@v3
       - name: INFO - pwd && ls
-        run: pwd && ls
+        run: pwd && ls ${{ github.workspace }}
       - name: Build the Docker image
         run: |
           pushd app
@@ -30,6 +36,7 @@ jobs:
       - run: docker logs $(docker ps -q)
       - name: Check with curl that image is running
         run: curl http://127.0.0.1:5000/
+      - ::set-output name={name}::{value}
       - name: Cleanup docker environment (removing all containers and images)
         if: always()
         run: | 
